@@ -8,6 +8,11 @@ Welcome to Advanced-ML, a repository showcasing advanced machine learning models
 - [Support Vector Machine](./SVM)
 - [Decision Tree](./Decision%20Tree)
 
+## Project Documentation
+
+Detailed documentation for this project can be found [here]([link/to/documentation](https://drive.google.com/drive/folders/1zp2Bj7vW0UkP-vzff4JIL9z9_1L1FnN7)).
+
+
 ## Datasets Used
 
 - [Name](link/to/dataset1) 
