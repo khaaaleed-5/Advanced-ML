@@ -3,7 +3,7 @@ Welcome to Advanced-ML, a repository showcasing advanced machine learning models
 
 
 
-![Project Logo](./Machine-Learning.JPG)
+![Project Logo](./Machine-Learning.jpg)
 
 ## Models Implemented
 
