@@ -10,9 +10,8 @@ Welcome to Advanced-ML, a repository showcasing advanced machine learning models
 
 ## Datasets Used
 
-- [Dataset 1: Name](link/to/dataset1) 
-- [Dataset 2: Name](link/to/dataset2)
-- [Dataset 3: Name](link/to/dataset3) 
+- [Name](link/to/dataset1) 
+- [Name](link/to/dataset2)
 
 ## Contributors
 - [**Khaled Ashraf**](https://github.com/khaaaleed-5)
