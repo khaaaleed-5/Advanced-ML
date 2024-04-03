@@ -10,7 +10,7 @@ Welcome to Advanced-ML, a repository showcasing advanced machine learning models
 
 ## Project Documentation
 
-Detailed documentation for this project can be found [here]([link/to/documentation](https://drive.google.com/drive/folders/1zp2Bj7vW0UkP-vzff4JIL9z9_1L1FnN7)).
+Detailed documentation for this project can be found [here](https://docs.google.com/document/d/1y9hp2C2JwGEn95T29iHW5vC2vGX6dBYJn3wSIW_IYMU/edit?usp=drive_link).
 
 
 ## Datasets Used
