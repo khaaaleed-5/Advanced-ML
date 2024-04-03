@@ -19,4 +19,4 @@ Welcome to Advanced-ML, a repository showcasing advanced machine learning models
 - [**Omar Adel**](https://github.com/omar55549)
 - [**Mohamed Hanafi**](https://github.com/mohamedhanfi)
 - [**Mohamed Hytham**](https://github.com/MedoHaytham)
-- [**Abdullah Hamdi**]()
+- [**Abdullah Hamdi**](https://github.com/AbdullaAlshayeb)
