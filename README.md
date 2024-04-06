@@ -17,8 +17,10 @@ Detailed documentation for this project can be found [here](https://drive.google
 
 ## Datasets Used
 
-- [Name](link/to/dataset1) 
-- [Name](link/to/dataset2)
+- [Fresh Vs Rotten](https://www.kaggle.com/datasets/alihasnainch/fruits-dataset-for-classification) 
+- [Marriage Proposal](https://www.kaggle.com/datasets/anyasorc/marriage-proposal)
+- [Pakistan Housnig Price](https://www.kaggle.com/datasets/jillanisofttech/pakistan-house-price-dataset) 
+
 
 ## Contributors
 - [**Khaled Ashraf**](https://github.com/khaaaleed-5)
