@@ -123,6 +123,9 @@ class SampleApp(tk.Tk):
     def load_ANN_model(self):
         ANN_model = load_model('./NN/model.h5')
         return ANN_model
+    def load_svm_model(self):
+        svr_model = load_model('./SVM/models/svrmodel.pkl')
+        return svr_model
 
 if __name__ == "__main__":
     app = SampleApp()
