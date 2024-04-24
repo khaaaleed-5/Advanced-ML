@@ -98,93 +98,120 @@ class PageTwo(Page):
         
         def process_inputs():
          # Retrieve values from entry fields and variables
-            agency_value = self.agency_entry.get()
-            agent_value = self.agent_entry.get()
-            area_value = self.area_entry.get()
-            location_value = self.location_entry.get()
-            city_value = self.city_entry.get()
-            province_name_value = self.province_name_entry.get()
-            latitude_value = self.latitude_entry.get()
-            longitude_value = self.longitude_entry.get()
-            baths_value = self.baths_var.get()
-            bedrooms_value = self.bedrooms_var.get()
-            property_type_value = self.property_type_var.get()
-            purpose_value = self.purpose_var.get()
+            df=save_user_inputs()
+            encodded_df=encode_categorical_variables(df)
+            print(encodded_df)
             
-            process_values(agency_value,agent_value,area_value,location_value,city_value,province_name_value,latitude_value,longitude_value,baths_value,bedrooms_value,property_type_value,purpose_value)
+
+            
     
-      
-        def process_values(agency, agent, area, location, city, province_name, latitude, longitude, baths, bedrooms, property_type, purpose):
-            thing= encode_categorical_variables(agency, agent, location, city, province_name, property_type, purpose)
-            print(thing)
-            
-            
-       
-
-        def cluster_locations(dataset):
-                kmeans = KMeans(n_clusters=3, random_state=42, n_init=10).fit(dataset[['latitude', 'longitude']])
-                dataset['location_cluster'] = kmeans.labels_
-                return dataset
-
-        def scale_numeric_data(dataset):
-                df=handling_Datset()
-                mean_areaSize=np.mean(df['baths'])
-                mean_areaSize=np.mean(df['bedrooms'])
-                mean_areaSize=np.mean(df['Area Size'])
-                mean_areaSize=np.mean(df['latitude'])
-                mean_areaSize=np.mean(df['longitude'])
-                mean_areaSize=np.mean(df['location_cluster'])
-
-
-                std_areaSize_areaSize=np.std(df['baths'])
-                std_areaSize=np.std(df['bedrooms'])
-                std_areaSize=np.std(df['Area Size'])
-                std_areaSize=np.std(df['latitude'])
-                std_areaSize=np.std(df['longitude'])
-                std_areaSize=np.std(df['location_cluster'])
-
-                scaler = StandardScaler()
-                numeric_columns = ['baths', 'bedrooms', 'Area Size', 'latitude', 'longitude', 'location_cluster']
-                dataset[numeric_columns] = scaler.fit_transform(dataset[numeric_columns])
-                return dataset
-
-        def encode_categorical_variables(agency, agent, location, city, province_name, property_type, purpose):
-                # Creating a dictionary with variable names as keys and their values as lists
-                data = {
-                    'property_type': [property_type],
-                    'city': [city],
-                    'province_name': [province_name],
-                    'purpose': [purpose],
-                    'location': [location],
-                    'agent': [agent],
-                    'agency': [agency]
+        def save_user_inputs():
+                global user_inputs_df
+                
+                # Retrieve values from entry fields and variables
+                agency_value = self.agency_entry.get()
+                agent_value = self.agent_entry.get()
+                area_value = self.area_entry.get()
+                location_value = self.location_entry.get()
+                city_value = self.city_entry.get()
+                province_name_value = self.province_name_entry.get()
+                latitude_value = self.latitude_entry.get()
+                longitude_value = self.longitude_entry.get()
+                baths_value = self.baths_var.get()
+                bedrooms_value = self.bedrooms_var.get()
+                property_type_value = self.property_type_var.get()
+                purpose_value = self.purpose_var.get()
+                
+                # Create a dictionary with user inputs
+                user_inputs_dict = {
+                        'agency': agency_value,
+                        'agent': agent_value,
+                        'area': area_value,
+                        'location': location_value,
+                        'city': city_value,
+                        'province_name': province_name_value,
+                        'latitude': latitude_value,
+                        'longitude': longitude_value,
+                        'baths': baths_value,
+                        'bedrooms': bedrooms_value,
+                        'property_type': property_type_value,
+                        'purpose': purpose_value
                 }
                 
-                # Creating a DataFrame from the dictionary
-                df = pd.DataFrame(data)
+                # Convert the dictionary to a DataFrame
+                df = pd.DataFrame(user_inputs_dict, index=[0])
                 
-                # Load your dataset
-                dataset = handling_Datset()
-                # Assuming 'dataset' is the DataFrame used in the target encoding function
-                categorical_columns = ['property_type', 'city', 'province_name', 'purpose', 'location', 'agent', 'agency']
-                encoder = ce.TargetEncoder(cols=categorical_columns)
+                # Return the DataFrame
+                return df
+        
                 
-                # Fit the encoder on the dataset and transform the provided data
-                encoder.fit(dataset[categorical_columns], dataset['price'])
-                encoded_df = encoder.transform(df)
+        numeric_columns=['baths','bedrooms','Area Size','latitude','longitude']
+
+
+        # def cluster_locations(dataset):
+        #         kmeans = KMeans(n_clusters=3, random_state=42, n_init=10).fit(dataset[['latitude', 'longitude']])
+        #         dataset['location_cluster'] = kmeans.labels_
+        #         return dataset
+
+        def z_score_scaling_manual(df):
+                numeric_columns = df.select_dtypes(include=np.number).columns.tolist()  # Get numeric column names
                 
-                return encoded_df
+                scaled_data_array = []  # Empty list to store scaled data for each column
+                
+                for column in numeric_columns:
+                        # Calculate mean and standard deviation for the current column
+                        mean = np.mean(df[column])
+                        std_dev = np.std(df[column])
+                        
+                        # Z-score scaling formula: (x - mean) / std_dev
+                        scaled_column = (df[column] - mean) / std_dev
+                        
+                        # Append scaled column to the array
+                        scaled_data_array.append(scaled_column)
+                
+                # Convert the list of scaled columns into a DataFrame
+                scaled_df = pd.DataFrame(scaled_data_array).T  # Transpose the DataFrame to match original DataFrame shape
+                scaled_df.columns = numeric_columns  # Set column names
+                
+                return scaled_df
+
+        
+
+        def encode_categorical_variables(User_Data_Df):
+                        # Creating a dictionary with variable names as keys and their values as lists
+                
+                        
+                        # Load your dataset
+                        dataset = handling_Datset(True)  # Assuming this function loads your dataset
+                        categorical_columns = ['property_type', 'city', 'province_name', 'purpose', 'location', 'agent', 'agency']
+                        
+                        # Create a new DataFrame with only the specified columns to encode
+                        uDF=User_Data_Df.copy()
+                        
+                        uDF = uDF[categorical_columns]
+                        
+        
+                        # Fit the encoder on the dataset and transform the provided data
+                        encoder = ce.TargetEncoder(cols=categorical_columns)
+                        encoder.fit(dataset[categorical_columns], dataset['price'])
+                        encoded_df = encoder.transform(uDF)
+                        
+                        unscaled_df=User_Data_Df.drop(columns=categorical_columns)
+                        scaled_df=z_score_scaling_manual(unscaled_df)
+                        
+                        # Combine the encoded columns with the rest of the original DataFrame
+                        df_encoded = pd.concat([scaled_df, encoded_df], axis=1)
+                        
+                        return df_encoded
             
 
 
         def preprocess_dataset(dataset):
-                df = cluster_locations(df)
-                df = scale_numeric_data(df)
                 df = encode_categorical_variables(df)
                 return df
 
                 
-        def handling_Datset():
+        def handling_Datset(scale=False):
                 dataset = pd.read_csv('./Datasets/regression.csv')
                 
                 # droping duplictes       
@@ -214,9 +241,11 @@ class PageTwo(Page):
                 scaler = StandardScaler()
 
                 # Scaling our numeric data
-                df['price']=scaler.fit_transform(df[['price']])
-                
-                return df
+                if scale==True: 
+                        df['price']=scaler.fit_transform(df[['price']])
+                        return df
+                else:
+                        return df
 
 # Agency
         agency_frame = tk.Frame(self, bg='#041618')
