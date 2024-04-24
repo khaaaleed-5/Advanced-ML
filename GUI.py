@@ -98,12 +98,14 @@ class PageTwo(Page):
         
         def process_inputs():
          # Retrieve values from entry fields and variables
-            df=save_user_inputs()
-            encodded_df=encode_categorical_variables(df)
-            print(encodded_df)
+             df=save_user_inputs()
+             encodded_df=encode_categorical_variables(df)
+             print(encodded_df)
+             #z_score_scaling_manual(df)
             
 
             
+    # function that read the user inputs
     
         def save_user_inputs():
                 global user_inputs_df
@@ -111,12 +113,12 @@ class PageTwo(Page):
                 # Retrieve values from entry fields and variables
                 agency_value = self.agency_entry.get()
                 agent_value = self.agent_entry.get()
-                area_value = self.area_entry.get()
+                area_value = float(self.area_entry.get())
                 location_value = self.location_entry.get()
                 city_value = self.city_entry.get()
                 province_name_value = self.province_name_entry.get()
-                latitude_value = self.latitude_entry.get()
-                longitude_value = self.longitude_entry.get()
+                latitude_value = float(self.latitude_entry.get())
+                longitude_value = float(self.longitude_entry.get())
                 baths_value = self.baths_var.get()
                 bedrooms_value = self.bedrooms_var.get()
                 property_type_value = self.property_type_var.get()
@@ -126,7 +128,7 @@ class PageTwo(Page):
                 user_inputs_dict = {
                         'agency': agency_value,
                         'agent': agent_value,
-                        'area': area_value,
+                        'Area Size': area_value,
                         'location': location_value,
                         'city': city_value,
                         'province_name': province_name_value,
@@ -144,39 +146,35 @@ class PageTwo(Page):
                 # Return the DataFrame
                 return df
         
-                
-        numeric_columns=['baths','bedrooms','Area Size','latitude','longitude']
-
-
-        # def cluster_locations(dataset):
-        #         kmeans = KMeans(n_clusters=3, random_state=42, n_init=10).fit(dataset[['latitude', 'longitude']])
-        #         dataset['location_cluster'] = kmeans.labels_
-        #         return dataset
-
+        # function that scales the user input data
         def z_score_scaling_manual(df):
-                numeric_columns = df.select_dtypes(include=np.number).columns.tolist()  # Get numeric column names
+                numeric_columns = ['baths', 'bedrooms', 'Area Size', 'latitude', 'longitude']  # Get numeric column names
+
                 
                 scaled_data_array = []  # Empty list to store scaled data for each column
                 
+                Dataset=handling_Datset(False)
+                
                 for column in numeric_columns:
                         # Calculate mean and standard deviation for the current column
-                        mean = np.mean(df[column])
-                        std_dev = np.std(df[column])
+                        mean = np.mean(Dataset[column])
+                        std_dev = np.std(Dataset[column])
                         
-                        # Z-score scaling formula: (x - mean) / std_dev
+                        
+                        #Z-score scaling formula: (x - mean) / std_dev
                         scaled_column = (df[column] - mean) / std_dev
                         
-                        # Append scaled column to the array
+                        #Append scaled column to the array
                         scaled_data_array.append(scaled_column)
                 
-                # Convert the list of scaled columns into a DataFrame
-                scaled_df = pd.DataFrame(scaled_data_array).T  # Transpose the DataFrame to match original DataFrame shape
-                scaled_df.columns = numeric_columns  # Set column names
+                 # Convert the list of scaled columns into a DataFrame
+                scaled_df = pd.DataFrame(scaled_data_array).T   # Transpose the DataFrame to match original DataFrame shape
+                #scaled_df.columns = numeric_columns  # Set column names
                 
                 return scaled_df
 
         
-
+        
         def encode_categorical_variables(User_Data_Df):
                         # Creating a dictionary with variable names as keys and their values as lists
                 
@@ -397,6 +395,9 @@ class SampleApp(tk.Tk):
     def load_ANN_model(self):
         ANN_model = load_model('./NN/model.h5')
         return ANN_model
+    def load_SVM_model(self):
+        svr_model = load_model('./SVM/models/svrmodel.pkl')
+        return svr_model
 
 if __name__ == "__main__":
     app = SampleApp()
