@@ -10,7 +10,13 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
 import category_encoders as ce
+import joblib
+import pickle
+import os
 
+
+
+abspath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'SVM/')
 
 
 #All pages
@@ -97,10 +103,26 @@ class PageTwo(Page):
         Page.__init__(self, parent, controller, "SVM")
         
         def process_inputs():
-         # Retrieve values from entry fields and variables
-             df=save_user_inputs()
-             encodded_df=encode_categorical_variables(df)
-             print(encodded_df)
+             desired_columns=['property_type' , 'city' , 'province_name', 'purpose'  ,'location' ,'agent' , 'agency' , 'baths'  ,  'bedrooms','Area Size' ]
+
+             # Retrieve values from entry fields and variables
+             df=encode_categorical_variables()
+             df = df.reindex(columns=desired_columns)
+             svr_model=self.controller.load_SVM_model()
+             pred=svr_model.predict(df)
+             pred = pred.reshape(1, -1)
+
+             with open(abspath+"target_scaler.pkl","rb") as f:
+                        scaler=pickle.load(f)
+             org_pred=scaler.inverse_transform(pred)
+             # Update the prediction label with the predicted class
+             self.prediction_label.config(text=f"Prediction: {int(org_pred[0][0])}")
+             
+            
+             
+             
+
+             
              #z_score_scaling_manual(df)
             
 
@@ -117,8 +139,6 @@ class PageTwo(Page):
                 location_value = self.location_entry.get()
                 city_value = self.city_entry.get()
                 province_name_value = self.province_name_entry.get()
-                latitude_value = float(self.latitude_entry.get())
-                longitude_value = float(self.longitude_entry.get())
                 baths_value = self.baths_var.get()
                 bedrooms_value = self.bedrooms_var.get()
                 property_type_value = self.property_type_var.get()
@@ -132,8 +152,6 @@ class PageTwo(Page):
                         'location': location_value,
                         'city': city_value,
                         'province_name': province_name_value,
-                        'latitude': latitude_value,
-                        'longitude': longitude_value,
                         'baths': baths_value,
                         'bedrooms': bedrooms_value,
                         'property_type': property_type_value,
@@ -146,104 +164,36 @@ class PageTwo(Page):
                 # Return the DataFrame
                 return df
         
-        # function that scales the user input data
-        def z_score_scaling_manual(df):
-                numeric_columns = ['baths', 'bedrooms', 'Area Size', 'latitude', 'longitude']  # Get numeric column names
-
-                
-                scaled_data_array = []  # Empty list to store scaled data for each column
-                
-                Dataset=handling_Datset(False)
-                
-                for column in numeric_columns:
-                        # Calculate mean and standard deviation for the current column
-                        mean = np.mean(Dataset[column])
-                        std_dev = np.std(Dataset[column])
-                        
-                        
-                        #Z-score scaling formula: (x - mean) / std_dev
-                        scaled_column = (df[column] - mean) / std_dev
-                        
-                        #Append scaled column to the array
-                        scaled_data_array.append(scaled_column)
-                
-                 # Convert the list of scaled columns into a DataFrame
-                scaled_df = pd.DataFrame(scaled_data_array).T   # Transpose the DataFrame to match original DataFrame shape
-                #scaled_df.columns = numeric_columns  # Set column names
-                
-                return scaled_df
-
+    
         
-        
-        def encode_categorical_variables(User_Data_Df):
-                        # Creating a dictionary with variable names as keys and their values as lists
+        def encode_categorical_variables():
                 
+                        # # Creating a dictionary with variable names as keys and their values as lists
                         
-                        # Load your dataset
-                        dataset = handling_Datset(True)  # Assuming this function loads your dataset
-                        categorical_columns = ['property_type', 'city', 'province_name', 'purpose', 'location', 'agent', 'agency']
-                        
-                        # Create a new DataFrame with only the specified columns to encode
-                        uDF=User_Data_Df.copy()
-                        
-                        uDF = uDF[categorical_columns]
-                        
-        
-                        # Fit the encoder on the dataset and transform the provided data
-                        encoder = ce.TargetEncoder(cols=categorical_columns)
-                        encoder.fit(dataset[categorical_columns], dataset['price'])
-                        encoded_df = encoder.transform(uDF)
-                        
-                        unscaled_df=User_Data_Df.drop(columns=categorical_columns)
-                        scaled_df=z_score_scaling_manual(unscaled_df)
-                        
-                        # Combine the encoded columns with the rest of the original DataFrame
-                        df_encoded = pd.concat([scaled_df, encoded_df], axis=1)
-                        
-                        return df_encoded
-            
+                with open(abspath+"encoder.pkl","rb") as f :
+                    encoder = pickle.load(f)
+                                 
+                df=scaling_data()
+                df2=df.copy()
+                df2=df2.drop(columns=['agency', 'agent', 'location', 'city', 'province_name', 'property_type','purpose'])
+                df=encoder.transform(df[['agency', 'agent', 'location', 'city', 'province_name', 'property_type','purpose']])
+                df = pd.concat([df2, df], axis=1)
 
-
-        def preprocess_dataset(dataset):
-                df = encode_categorical_variables(df)
                 return df
-
+                                 
+                                 
+                 
+        def scaling_data():
                 
-        def handling_Datset(scale=False):
-                dataset = pd.read_csv('./Datasets/regression.csv')
-                
-                # droping duplictes       
-                drop_colums=['property_id', 'location_id', 'page_url']
-                df = dataset.drop(columns= drop_colums, axis=1)
-                df = df.drop_duplicates()
-                # droping na values
-                df = df.dropna()
-                # handling outliers
-                numeric_columns = ['price', 'baths', 'Area Size', 'bedrooms']
-                new_df=df.copy()
-                for col in numeric_columns:
-                    Q1 = new_df[col].quantile(0.25)
-                    Q3 = new_df[col].quantile(0.75)
-                    IQR = Q3 - Q1
-                    lower_bound = Q1 - 1.5 * IQR
-                    upper_bound = Q3 + 1.5 * IQR
-                    new_df[col] = np.where(
-                        new_df[col] > upper_bound,
-                        upper_bound,
-                        np.where(
-                            new_df[col] < lower_bound,
-                            lower_bound,
-                            new_df[col]))
-                df = new_df   
-                
-                scaler = StandardScaler()
-
-                # Scaling our numeric data
-                if scale==True: 
-                        df['price']=scaler.fit_transform(df[['price']])
-                        return df
-                else:
-                        return df
+                with open(abspath+"scaler.pkl","rb") as f:
+                        scaler=pickle.load(f)
+                        
+                df=save_user_inputs()
+                        
+                df[['baths', 'bedrooms', 'Area Size']]=scaler.transform(df[['baths', 'bedrooms', 'Area Size']])
+                        
+                return df
+        #        
 
 # Agency
         agency_frame = tk.Frame(self, bg='#041618')
@@ -293,22 +243,6 @@ class PageTwo(Page):
         self.province_name_entry = tk.Entry(province_name_frame, bg='#FFFFC7', font=("Helvetica", 12))
         self.province_name_entry.grid(row=0, column=1, padx=10, pady=5)
 
-# Latitude
-        latitude_frame = tk.Frame(self, bg='#041618')
-        latitude_frame.pack(pady=5)
-        latitude_label = tk.Label(latitude_frame, text="Latitude:", bg='#041618', fg="#FFFFC7", font=("Helvetica", 16))
-        latitude_label.grid(row=0, column=0, padx=10, pady=5, sticky='w')
-        self.latitude_entry = tk.Entry(latitude_frame, bg='#FFFFC7', font=("Helvetica", 12))
-        self.latitude_entry.grid(row=0, column=1, padx=10, pady=5)
-
-# Longitude
-
-        longitude_frame = tk.Frame(self, bg='#041618')
-        longitude_frame.pack(pady=5)
-        longitude_label = tk.Label(longitude_frame, text="Longitude:", bg='#041618', fg="#FFFFC7", font=("Helvetica", 16))
-        longitude_label.grid(row=0, column=0, padx=10, pady=5, sticky='w')
-        self.longitude_entry = tk.Entry(longitude_frame, bg='#FFFFC7', font=("Helvetica", 12))
-        self.longitude_entry.grid(row=0, column=1, padx=10, pady=5)
 
 # Baths
         baths_frame = tk.Frame(self, bg='#041618')
@@ -351,6 +285,11 @@ class PageTwo(Page):
         purpose_menu = tk.OptionMenu(purpose_frame, self.purpose_var, "For Sale", "For Rent")
         purpose_menu.config(bg='#FFFFC7', font=("Helvetica", 12))
         purpose_menu.grid(row=0, column=1, padx=10, pady=5)
+        
+# Create a label to display the prediction result
+        self.prediction_label = tk.Label(self, text="", bg='#041618', fg="#FFFFC7", font=("Helvetica", 16))
+        self.prediction_label.pack(pady=10)
+
         
 # Create a button to trigger the function
         process_button = tk.Button(self, text="Process Inputs", command=process_inputs, bg='#FFFFC7', font=("Helvetica", 14))
@@ -396,7 +335,7 @@ class SampleApp(tk.Tk):
         ANN_model = load_model('./NN/model.h5')
         return ANN_model
     def load_SVM_model(self):
-        svr_model = load_model('./SVM/models/svrmodel.pkl')
+        svr_model = joblib.load('./SVM/models/svrmodel.pkl')
         return svr_model
 
 if __name__ == "__main__":
