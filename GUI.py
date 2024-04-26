@@ -5,15 +5,9 @@ import cv2
 import numpy as np
 from keras.models import load_model
 import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-from sklearn.preprocessing import StandardScaler
-from sklearn.cluster import KMeans
-import category_encoders as ce
 import joblib
 import pickle
 import os
-
 
 
 abspath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'SVM/')
@@ -102,33 +96,41 @@ class PageTwo(Page):
     def __init__(self, parent, controller):
         Page.__init__(self, parent, controller, "SVM")
         
-        def process_inputs():
-             desired_columns=['property_type' , 'city' , 'province_name', 'purpose'  ,'location' ,'agent' , 'agency' , 'baths'  ,  'bedrooms','Area Size' ]
-
-             # Retrieve values from entry fields and variables
-             df=encode_categorical_variables()
-             df = df.reindex(columns=desired_columns)
+        # Function that maakes predictions and displays it 
+        def make_predictions():
+                
+             # Cols with the order of the features trained on the model   
+             reindexed_columns=['property_type' , 'city' , 'province_name', 'purpose'  ,'location' ,'agent' , 'agency' , 'baths'  ,  'bedrooms','Area Size' ]
+             
+             # Saving the user inputs data into a dataframe
+             df=save_user_inputs()
+             
+             # Scaling the user input data
+             df=scaling_data(df)
+             
+             # Encoding the user input data
+             df=encode_categorical_variables(df)
+             
+             # Reindexing the user inputs dataframe to fit the order of the model order    
+             df = df.reindex(columns=reindexed_columns)
+             
+             # Using the loaded model to Predict the price 
              svr_model=self.controller.load_SVM_model()
              pred=svr_model.predict(df)
              pred = pred.reshape(1, -1)
-
+             
+             # Calling the loaded target scaler for inverse scaling our prediction
              with open(abspath+"target_scaler.pkl","rb") as f:
                         scaler=pickle.load(f)
              org_pred=scaler.inverse_transform(pred)
-             # Update the prediction label with the predicted class
+             
+             # Updating the prediction label with the predicted class
              self.prediction_label.config(text=f"Prediction: {int(org_pred[0][0])}")
              
             
              
-             
-
-             
-             #z_score_scaling_manual(df)
-            
-
-            
-    # function that read the user inputs
-    
+                       
+        # function that read the user inputs      
         def save_user_inputs():
                 global user_inputs_df
                 
@@ -165,37 +167,43 @@ class PageTwo(Page):
                 return df
         
     
-        
-        def encode_categorical_variables():
+        # encoding the user input data
+        def encode_categorical_variables(df):
                 
-                        # # Creating a dictionary with variable names as keys and their values as lists
-                        
+                # loading the Encoder we need        
                 with open(abspath+"encoder.pkl","rb") as f :
                     encoder = pickle.load(f)
-                                 
-                df=scaling_data()
+                    
+                # Copying the dataframe of user input data we need so we can perform encoding only on the categorial data                 
                 df2=df.copy()
-                df2=df2.drop(columns=['agency', 'agent', 'location', 'city', 'province_name', 'property_type','purpose'])
+                
+                # Encoding the categorial data in the dataframe we need
                 df=encoder.transform(df[['agency', 'agent', 'location', 'city', 'province_name', 'property_type','purpose']])
+                
+                # Droping the categorial data from the dataframe that is not encoded
+                df2=df2.drop(columns=['agency', 'agent', 'location', 'city', 'province_name', 'property_type','purpose'])
+                
+                # Merging the numeric dataframe with the encoded numreic one
                 df = pd.concat([df2, df], axis=1)
 
+                # Returning the dataframe after encoding
                 return df
                                  
                                  
-                 
-        def scaling_data():
-                
+        # Scaling the user input data         
+        def scaling_data(df):
+                # Loading the sclaer we need 
                 with open(abspath+"scaler.pkl","rb") as f:
                         scaler=pickle.load(f)
                         
-                df=save_user_inputs()
-                        
+                # Scaling the dataframe which has the User Input data        
                 df[['baths', 'bedrooms', 'Area Size']]=scaler.transform(df[['baths', 'bedrooms', 'Area Size']])
-                        
+                    
+                # Returning the dataframe after Scaling data        
                 return df
-        #        
+                
 
-# Agency
+        # Agency field
         agency_frame = tk.Frame(self, bg='#041618')
         agency_frame.pack(pady=5)
         agency_label = tk.Label(agency_frame, text="Agency:", bg='#041618', fg="#FFFFC7", font=("Helvetica", 16))
@@ -203,7 +211,7 @@ class PageTwo(Page):
         self.agency_entry = tk.Entry(agency_frame, bg='#FFFFC7', font=("Helvetica", 12))
         self.agency_entry.grid(row=0, column=1, padx=10, pady=5)
 
-# Agent
+        # Agent field
         agent_frame = tk.Frame(self, bg='#041618')
         agent_frame.pack(pady=5)
         agent_label = tk.Label(agent_frame, text="Agent:", bg='#041618', fg="#FFFFC7", font=("Helvetica", 16))
@@ -211,7 +219,7 @@ class PageTwo(Page):
         self.agent_entry = tk.Entry(agent_frame, bg='#FFFFC7', font=("Helvetica", 12))
         self.agent_entry.grid(row=0, column=1, padx=10, pady=5)
 
-# Area Size
+        # Area Size field
         area_frame = tk.Frame(self, bg='#041618')
         area_frame.pack(pady=5)
         area_label = tk.Label(area_frame, text="Area Size:", bg='#041618', fg="#FFFFC7", font=("Helvetica", 16))
@@ -219,7 +227,7 @@ class PageTwo(Page):
         self.area_entry = tk.Entry(area_frame, bg='#FFFFC7', font=("Helvetica", 12))
         self.area_entry.grid(row=0, column=1, padx=10, pady=5)
 
-# Location
+        # Location field
         location_frame = tk.Frame(self, bg='#041618')
         location_frame.pack(pady=5)
         location_label = tk.Label(location_frame, text="Location:", bg='#041618', fg="#FFFFC7", font=("Helvetica", 16))
@@ -227,7 +235,7 @@ class PageTwo(Page):
         self.location_entry = tk.Entry(location_frame, bg='#FFFFC7', font=("Helvetica", 12))
         self.location_entry.grid(row=0, column=1, padx=10, pady=5)
 
-# City
+        # City field
         city_frame = tk.Frame(self, bg='#041618')
         city_frame.pack(pady=5)
         city_label = tk.Label(city_frame, text="City:", bg='#041618', fg="#FFFFC7", font=("Helvetica", 16))
@@ -235,7 +243,7 @@ class PageTwo(Page):
         self.city_entry = tk.Entry(city_frame, bg='#FFFFC7', font=("Helvetica", 12))
         self.city_entry.grid(row=0, column=1, padx=10, pady=5)
 
-# Province Name
+        # Province Name field
         province_name_frame = tk.Frame(self, bg='#041618')
         province_name_frame.pack(pady=5)
         province_name_label = tk.Label(province_name_frame, text="Province Name:", bg='#041618', fg="#FFFFC7", font=("Helvetica", 16))
@@ -244,7 +252,7 @@ class PageTwo(Page):
         self.province_name_entry.grid(row=0, column=1, padx=10, pady=5)
 
 
-# Baths
+        # Baths field
         baths_frame = tk.Frame(self, bg='#041618')
         baths_frame.pack(pady=5)
         baths_label = tk.Label(baths_frame, text="Baths:", bg='#041618', fg="#FFFFC7", font=("Helvetica", 16))
@@ -254,7 +262,7 @@ class PageTwo(Page):
         baths_spinbox = tk.Spinbox(baths_frame, from_=0, to=10, increment=1, textvariable=self.baths_var, font=("Helvetica", 12))
         baths_spinbox.grid(row=0, column=1, padx=10, pady=5)
 
-# Bedrooms
+        # Bedrooms field
         bedrooms_frame = tk.Frame(self, bg='#041618')
         bedrooms_frame.pack(pady=5)
         bedrooms_label = tk.Label(bedrooms_frame, text="Bedrooms:", bg='#041618', fg="#FFFFC7", font=("Helvetica", 16))
@@ -264,7 +272,7 @@ class PageTwo(Page):
         bedrooms_spinbox = tk.Spinbox(bedrooms_frame, from_=0, to=10, increment=1, textvariable=self.bedrooms_var, font=("Helvetica", 12))
         bedrooms_spinbox.grid(row=0, column=1, padx=10, pady=5)
 
-# Property Type
+        # Property Type field
         property_type_frame = tk.Frame(self, bg='#041618')
         property_type_frame.pack(pady=5)
         property_type_label = tk.Label(property_type_frame, text="Property Type:", bg='#041618', fg="#FFFFC7", font=("Helvetica", 16))
@@ -275,7 +283,7 @@ class PageTwo(Page):
         property_type_menu.config(bg='#FFFFC7', font=("Helvetica", 12))
         property_type_menu.grid(row=0, column=1, padx=10, pady=5)
 
-# Purpose
+        # Purpose field
         purpose_frame = tk.Frame(self, bg='#041618')
         purpose_frame.pack(pady=5)
         purpose_label = tk.Label(purpose_frame, text="Purpose:", bg='#041618', fg="#FFFFC7", font=("Helvetica", 16))
@@ -286,13 +294,13 @@ class PageTwo(Page):
         purpose_menu.config(bg='#FFFFC7', font=("Helvetica", 12))
         purpose_menu.grid(row=0, column=1, padx=10, pady=5)
         
-# Create a label to display the prediction result
+        # Label to display the prediction result
         self.prediction_label = tk.Label(self, text="", bg='#041618', fg="#FFFFC7", font=("Helvetica", 16))
         self.prediction_label.pack(pady=10)
 
         
-# Create a button to trigger the function
-        process_button = tk.Button(self, text="Process Inputs", command=process_inputs, bg='#FFFFC7', font=("Helvetica", 14))
+        # Button to trigger the function
+        process_button = tk.Button(self, text="Predict price", command=make_predictions, bg='#FFFFC7', font=("Helvetica", 14))
         process_button.pack(pady=10)
         
         
