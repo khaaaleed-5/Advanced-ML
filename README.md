@@ -18,7 +18,7 @@ Detailed documentation for this project can be found [here](https://docs.google.
 ## Datasets Used
 
 - [Fresh Vs Rotten](https://www.kaggle.com/datasets/alihasnainch/fruits-dataset-for-classification) 
-- [Marriage Proposal](https://www.kaggle.com/datasets/anyasorc/marriage-proposal)
+- [Heart Disease](https://www.kaggle.com/datasets/mexwell/heart-disease-dataset?select=heart_statlog_cleveland_hungary_final.csv)
 - [Pakistan Housnig Price](https://www.kaggle.com/datasets/jillanisofttech/pakistan-house-price-dataset) 
 
 
