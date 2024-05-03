@@ -9,8 +9,9 @@ import joblib
 import pickle
 import os
 
-
+# Saving the abs Path so we can use it to call Both the Scalers and the Encoders we Saved
 abspath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'SVM/')
+
 
 dtpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Decision Tree/')
 
@@ -97,8 +98,8 @@ class PageTwo(Page):
     def __init__(self, parent, controller):
         Page.__init__(self, parent, controller, "SVM")
         
-        # Function that maakes predictions and displays it 
-        def make_predictions():
+        # Function that makes predictions and displays it 
+        def predict_output():
                 
              # Cols with the order of the features trained on the model   
              reindexed_columns=['property_type' , 'city' , 'province_name', 'purpose'  ,'location' ,'agent' , 'agency' , 'baths'  ,  'bedrooms','Area Size' ]
@@ -112,7 +113,7 @@ class PageTwo(Page):
              # Encoding the user input data
              df=encode_categorical_variables(df)
              
-             # Reindexing the user inputs dataframe to fit the order of the model order    
+             # Reindexing the user inputs dataframe to fit the order of the model order ( the one that was trained on )   
              df = df.reindex(columns=reindexed_columns)
              
              # Using the loaded model to Predict the price 
@@ -128,78 +129,29 @@ class PageTwo(Page):
              # Updating the prediction label with the predicted class
              self.prediction_label.config(text=f"Prediction: {int(org_pred[0][0])}")
         
-             
-        def random_testing_values():
-            
-                #
-                dt = pd.read_csv('./SVM/test_values/Book1.csv')
-                dt
-                
-                
-                #           
-                property_type_values = np.ravel(dt['property_type'])
-                location_values = np.ravel(dt['location'])
-                city_values = np.ravel(dt['city'])
-                province_name_values = np.ravel(dt['province_name'])
-                baths_values = np.ravel(dt['baths'])
-                purpose_values = np.ravel(dt['purpose'])
-                bedrooms_values = np.ravel(dt['bedrooms'])
-                agency_values = np.ravel(dt['agency'])
-                agent_values = np.ravel(dt['agent'])
-                area_type_values = np.ravel(dt['Area Type'])
-                area_Size_values = np.ravel(dt['Area Size'])
-
-                #
-                index = np.random.randint(0, 7)
-            
-                # Clearing the agency field and setting a new value to it 
-                self.agency_entry.delete(0, tk.END)
-                self.agency_entry.insert(0, agency_values[index])
-
-                # Clearing the agent field and setting a new value to it 
-                self.agent_entry.delete(0, tk.END)
-                self.agent_entry.insert(0, agent_values[index])
-                
-                # Clearing the Location field and setting a new value to it 
-                self.location_entry.delete(0, tk.END)
-                self.location_entry.insert(0, location_values[index])
-                
-                # Setting values to the rest of the inputs 
-                self.city_var.set(city_values[index])
-                self.province_name_var.set(province_name_values[index])
-                self.baths_var.set(baths_values[index])
-                self.bedrooms_var.set(bedrooms_values[index])
-                self.property_type_var.set(property_type_values[index])
-                self.purpose_var.set(purpose_values[index])
-                
-                self.unit_combobox.delete(0, "end")
-                self.unit_combobox.set(area_type_values[index])
-                
-                self.area_spinbox.delete(0, "end")
-                self.area_spinbox.insert(0,area_Size_values[index])
-                
-                    
-                       
-            
+        # Function that does the math on the area size to convert it from Marla or Kanal to Square Meter
         def handle_area_Size():
-                area_value = float(self.area_spinbox.get())
-                area_type = self.unit_combobox.get()
+                # Reading the values from the user input fields
+                area_value = float(self.area_size.get())
+                area_type = self.area_type.get()
                 
+                # converting them from Marla to square meter
                 if  area_type=="Marla":
                    area_value *= 25.2929
+                # converting them from Kanal to square meter
                 else:
                     area_value *= 505.857   
                     
+                # returning the value 
                 return area_value      
 
-            
-                       
+              
         # function that read the user inputs      
         def save_user_inputs():
-            
-                global user_inputs_df
-                
+                            
+                # calling the math function to preprocess the area size field
                 area_size = handle_area_Size()
+                
                 # Retrieve values from entry fields and variables
                 agency_value = self.agency_entry.get()
                 agent_value = self.agent_entry.get()
@@ -257,7 +209,7 @@ class PageTwo(Page):
                                  
         # Scaling the user input data         
         def scaling_data(df):
-                # Loading the sclaer we need 
+                # Loading the Scaler we need 
                 with open(abspath+"scaler.pkl","rb") as f:
                         scaler=pickle.load(f)
                         
@@ -266,6 +218,71 @@ class PageTwo(Page):
                     
                 # Returning the dataframe after Scaling data        
                 return df
+            
+            
+             # Function to randomize user inputs according to some examples we put earlier ( just to save time during the model reveal)
+        def random_testing_values():
+            
+                # Reading the test values 
+                dt = pd.read_csv('./SVM/test_values/Book1.csv')
+                  
+                # Saving them into array      
+                property_type_values = np.ravel(dt['property_type'])
+                location_values = np.ravel(dt['location'])
+                city_values = np.ravel(dt['city'])
+                province_name_values = np.ravel(dt['province_name'])
+                baths_values = np.ravel(dt['baths'])
+                purpose_values = np.ravel(dt['purpose'])
+                bedrooms_values = np.ravel(dt['bedrooms'])
+                agency_values = np.ravel(dt['agency'])
+                agent_values = np.ravel(dt['agent'])
+                area_type_values = np.ravel(dt['Area Type'])
+                area_Size_values = np.ravel(dt['Area Size'])
+
+                # Picking a random number in 0 to 7 since we only have 8 test examples
+                index = np.random.randint(0, 7)
+            
+                # Clearing the agency field and setting the random test value to it ( one of the ones we have earlier)
+                self.agency_entry.delete(0, tk.END)
+                self.agency_entry.insert(0, agency_values[index])
+
+                # Clearing the agent field and setting the random test value to it ( one of the ones we have earlier)
+                self.agent_entry.delete(0, tk.END)
+                self.agent_entry.insert(0, agent_values[index])
+                
+                # Clearing the location field and setting the random test value to it ( one of the ones we have earlier)
+                self.location_entry.delete(0, tk.END)
+                self.location_entry.insert(0, location_values[index])
+                
+                # City field , setting the random test value to it ( one of the ones we have earlier)
+                self.city_var.set(city_values[index])
+                
+                # Province name field , setting the random test value to it ( one of the ones we have earlier)
+                self.province_name_var.set(province_name_values[index])
+                
+                # Baths field , setting the random test value to it ( one of the ones we have earlier)    
+                self.baths_var.set(baths_values[index])
+                
+                # Bedrooms field , setting the random test value to it ( one of the ones we have earlier)
+                self.bedrooms_var.set(bedrooms_values[index])
+                
+                # Property type field , setting the random test value to it ( one of the ones we have earlier)
+                self.property_type_var.set(property_type_values[index])
+                
+                # Purpose field , setting the random test value to it ( one of the ones we have earlier)
+                self.purpose_var.set(purpose_values[index])
+                
+                # Clearing the area Type field and setting the random test value to it 
+                self.area_type.delete(0, "end")
+                self.area_type.set(area_type_values[index])
+                
+                # Clearing the area Size field and setting the random test value to it 
+                self.area_size.delete(0, "end")
+                self.area_size.insert(0,area_Size_values[index])
+                
+                    
+                       
+            
                 
 
         # Agency field
@@ -299,11 +316,11 @@ class PageTwo(Page):
         area_frame.pack(pady=5)
         area_label = tk.Label(area_frame, text="Area Size:", bg='#041618', fg="#FFFFC7", font=("Helvetica", 14))
         area_label.grid(row=0, column=0, padx=5, pady=5, sticky='w')
-        self.area_spinbox = tk.Spinbox(area_frame, from_=0, to=1000, bg='#FFFFC7', font=("Helvetica", 10), width=7)
-        self.area_spinbox.grid(row=0, column=1, padx=(0, 5), pady=5)
-        self.unit_combobox = ttk.Combobox(area_frame, values=["marla", "kanal"], state="readonly", width=5)
-        self.unit_combobox.grid(row=0, column=2, padx=5, pady=5)
-        self.unit_combobox.current(0)  # Set default value to the first item
+        self.area_size = tk.Spinbox(area_frame, from_=0, to=1000, bg='#FFFFC7', font=("Helvetica", 10), width=7)
+        self.area_size.grid(row=0, column=1, padx=(0, 5), pady=5)
+        self.area_type = ttk.Combobox(area_frame, values=["marla", "kanal"], state="readonly", width=5)
+        self.area_type.grid(row=0, column=2, padx=5, pady=5)
+        self.area_type.current(0)  # Set default value to the first item
 
         # Baths field
         baths_frame = tk.Frame(self, bg='#041618')
@@ -377,12 +394,12 @@ class PageTwo(Page):
         self.prediction_label.pack(pady=10)
 
         
-        # Button to trigger the function
+        # Button to set some random inputs 
         process_button = tk.Button(self, text="random test inputs", command=random_testing_values, bg='#FFFFC7', font=("Helvetica", 14))
         process_button.pack(pady=10)
         
         # Button to trigger the function
-        process_button = tk.Button(self, text="Predict price", command=make_predictions, bg='#FFFFC7', font=("Helvetica", 14))
+        process_button = tk.Button(self, text="Predict price", command=predict_output, bg='#FFFFC7', font=("Helvetica", 14))
         process_button.pack(pady=10)
         
         
@@ -454,7 +471,7 @@ class PageThree(Page):
             else:
                 ST_slope_value = 3
          
-            # Create a dictionary with user inpUpslopinguts
+            # Create a dictionary with user input data
             user_inputs_dict = {
                     'age': age_value,
                     'sex': sex_value,
