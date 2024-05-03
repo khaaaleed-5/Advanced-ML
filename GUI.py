@@ -231,22 +231,7 @@ class PageTwo(Page):
         self.agent_entry = tk.Entry(agent_frame, bg='#FFFFC7', font=("Helvetica", 12))
         self.agent_entry.grid(row=0, column=1, padx=10, pady=5)
 
-        # Area Size frame
-        area_frame = tk.Frame(self, bg='#041618')
-        area_frame.pack(pady=5)
-
-        # Label for Area Size
-        area_label = tk.Label(area_frame, text="Area Size:", bg='#041618', fg="#FFFFC7", font=("Helvetica", 14))
-        area_label.grid(row=0, column=0, padx=5, pady=5, sticky='w')
-
-        # Entry for Area Size
-        self.area_entry = tk.Entry(area_frame, bg='#FFFFC7', font=("Helvetica", 10), width=10)
-        self.area_entry.grid(row=0, column=1, padx=5, pady=5)
-
-        # Combobox for Unit Selection
-        self.unit_combobox = ttk.Combobox(area_frame, values=["marla", "kanal"], state="readonly", width=5)
-        self.unit_combobox.grid(row=0, column=2, padx=5, pady=5)
-        self.unit_combobox.current(0)  # Set default value to the first item
+         
         # Location field
         location_frame = tk.Frame(self, bg='#041618')
         location_frame.pack(pady=5)
@@ -254,6 +239,18 @@ class PageTwo(Page):
         location_label.grid(row=0, column=0, padx=10, pady=5, sticky='w')
         self.location_entry = tk.Entry(location_frame, bg='#FFFFC7', font=("Helvetica", 12))
         self.location_entry.grid(row=0, column=1, padx=10, pady=5)
+        
+        
+        # Area Size 
+        area_frame = tk.Frame(self, bg='#041618')
+        area_frame.pack(pady=5)
+        area_label = tk.Label(area_frame, text="Area Size:", bg='#041618', fg="#FFFFC7", font=("Helvetica", 14))
+        area_label.grid(row=0, column=0, padx=5, pady=5, sticky='w')
+        self.area_entry = tk.Entry(area_frame, bg='#FFFFC7', font=("Helvetica", 10), width=10)
+        self.area_entry.grid(row=0, column=1, padx=5, pady=5)
+        self.unit_combobox = ttk.Combobox(area_frame, values=["marla", "kanal"], state="readonly", width=5)
+        self.unit_combobox.grid(row=0, column=2, padx=5, pady=5)
+        self.unit_combobox.current(0)  # Set default value to the first item
 
         # Baths field
         baths_frame = tk.Frame(self, bg='#041618')
