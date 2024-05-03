@@ -21,6 +21,9 @@ Detailed documentation for this project can be found [here](https://docs.google.
 - [Heart Disease](https://www.kaggle.com/datasets/mexwell/heart-disease-dataset?select=heart_statlog_cleveland_hungary_final.csv)
 - [Pakistan Housnig Price](https://www.kaggle.com/datasets/jillanisofttech/pakistan-house-price-dataset) 
 
+## Quick Start
+- Clone the Repo ```git clone https://github.com/khaaaleed-5/Advanced-ML.git```
+- run **GUI.py** file then choose the model 
 
 ## Contributors
 - [**Khaled Ashraf**](https://github.com/khaaaleed-5)
