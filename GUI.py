@@ -9,9 +9,9 @@ import joblib
 import pickle
 import os
 
-
 abspath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'SVM/')
 
+dtpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Decision Tree/')
 
 #All pages
 class Page(tk.Frame):
@@ -308,9 +308,249 @@ class PageTwo(Page):
 
 
 #Decision tree page
-class PageThree(Page):
+class PageThree(Page): 
     def __init__(self, parent, controller):
         Page.__init__(self, parent, controller, "Decision tree")
+        def save_user_inputs():
+            global user_inputs_df
+                    
+            # Retrieve values from entry fields and variables
+            age_value=self.age_entry.get()
+            sex_value=self.Sex.get()
+            chest_pain_type_value = self.chest_pain_type.get()
+            resting_bps_value = self.resting_bps.get()
+            cholesterol_value = self.cholesterol.get()
+            fasting_blood_sugar_value = self.fasting_blood_sugar.get()
+            resting_ecg_value = self.resting_ecg.get()
+            max_heart_rate_value = self.max_heart_rate.get()
+            exercise_angina_value = self.exercise_angina.get()
+            oldpeak_value = self.oldpeak.get()
+            ST_slope_value = self.ST_slope.get()
+
+         #convert string value to intger 
+         #sex
+            if self.Sex.get() == "Male":
+                        sex_value= 1
+            elif self.Sex.get() == "Female":
+                        sex_value= 0
+            else:
+                        return None  
+           # chest pain type         
+            if self.chest_pain_type.get() =="Typical angina":
+                chest_pain_type_value = 1
+            elif self.chest_pain_type.get() =="Atypical angina":
+                chest_pain_type_value = 2
+            elif self.chest_pain_type.get() =="Non-anginal pain":
+                chest_pain_type_value = 3
+            else:
+                chest_pain_type_value = 4
+            
+            # Fasting blood sugar
+            if self.fasting_blood_sugar.get()=='Fasting blood sugar > 120 mg/dl':
+                 fasting_blood_sugar_value=1  
+            else:
+                 fasting_blood_sugar_value=0 
+           #resting ecg         resting_ecg_menu = tk.OptionMenu(resting_ecg_frame, self.resting_ecg, "Normal", " Having ST-T wave abnormality","Showing probable or definite left ventricular hypertrophy by Estes criteria")
+
+            if self.resting_ecg.get() =="Normal":
+                resting_ecg_value  = 0
+            elif self.resting_ecg.get() =="Having ST-T wave abnormality":
+                resting_ecg_value  = 1
+            else:
+                resting_ecg_value  = 2
+         # exercise angina
+            if self.exercise_angina.get()=='YES':
+                 exercise_angina_value=1  
+            else:
+                 exercise_angina_value=0
+          #  ST slope         
+
+            if self.ST_slope.get() == "Upsloping":
+                    ST_slope_value = 1
+            elif self.ST_slope.get() == "Flat":
+                ST_slope_value = 2
+            else:
+                ST_slope_value = 3
+         
+            # Create a dictionary with user inpUpslopinguts
+            user_inputs_dict = {
+                    'age': age_value,
+                    'sex': sex_value,
+                    'chest pain type': chest_pain_type_value,
+                    'resting bp s': resting_bps_value,
+                    'cholesterol': cholesterol_value,
+                    'fasting blood sugar': fasting_blood_sugar_value,
+                    'resting ecg': resting_ecg_value,
+                    'max heart rate': max_heart_rate_value,
+                    'exercise angina': exercise_angina_value,
+                    'oldpeak': oldpeak_value,
+                    'ST slope' : ST_slope_value
+                    }
+            # Convert the dictionary to a DataFrame
+            df = pd.DataFrame(user_inputs_dict, index=[0])
+            # Return the DataFrame
+            return df
+                  
+        def scaling_data(df):
+                
+                with open(dtpath+"scaler.pkl","rb") as f:
+                        scaler=pickle.load(f)
+                        
+                df=save_user_inputs()
+                        
+                df[['age','resting bp s','cholesterol','max heart rate','oldpeak']] = scaler.fit_transform(df[['age', 'resting bp s', 'cholesterol', 'max heart rate', 'oldpeak']])
+
+                        
+                return df
+         
+
+        # Function that maakes predictions and displays it on activation failed: "No access to GitHub Copilot found. You are currently logged in as mohamedhanfi."
+        def make_predictions():
+                
+             # Cols with the order of the features trained on the model   
+             reindexed_columns=['age','sex','chest pain type','resting bp s','cholesterol','fasting blood sugar','resting ecg','max heart rate','exercise angina','oldpeak','ST slope']
+             
+             # Saving the user inputs data into a dataframe
+             df=save_user_inputs()
+       
+             # Scaling the user input data
+             df=scaling_data(df)
+
+             # Reindexing the user inputs dataframe to fit the order of the model order    
+             df = df.reindex(columns=reindexed_columns)
+             print(df)
+
+             # Using the loaded model to Predict the price 
+             dt_model=self.controller.load_dt_model()
+             pred=dt_model.predict(df)
+             pred = pred.reshape(1, -1)
+             # Updating the prediction label with the predicted class
+             self.prediction_label.config(text=f"Prediction: {(pred[0][0])}")     
+             # Updating the prediction label with the predicted class
+             prediction_value = pred[0][0]
+             if prediction_value == 1:
+                self.prediction_label.config(text="Result: Positive", fg="red")
+             elif prediction_value == 0:
+                self.prediction_label.config(text="Result: Negative",fg="green")
+
+
+
+# Age
+        age_entry_frame = tk.Frame(self, bg='#041618')
+        age_entry_frame.pack(pady=5)
+        age_entry_label = tk.Label(age_entry_frame, text="Age:", bg='#041618', fg="#FFFFC7", font=("Times New Roman", 18))
+        age_entry_label.grid(row=0, column=0, padx=10, pady=0, sticky='w')
+        self.age_entry = tk.Entry(age_entry_frame, bg='#FFFFC7', fg='#041618', font=("Arial", 12))  
+        self.age_entry.grid(row=0, column=1, padx=10, pady=5)
+
+# Sex
+        Sex_frame = tk.Frame(self, bg='#041618')
+        Sex_frame.pack(pady=5)
+        Sex_label = tk.Label(Sex_frame, text="Sex:", bg='#041618', fg="#FFFFC7", font=("Times New Roman", 18))
+        Sex_label.grid(row=0, column=0, padx=10, pady=5, sticky='w')
+        self.Sex = tk.StringVar(self) 
+        self.Sex.set("Male")
+        Sex_menu = tk.OptionMenu(Sex_frame, self.Sex, "Male", "Female")
+        Sex_menu.config(bg='#FFFFC7', font=("Helvetica", 12))
+        Sex_menu.grid(row=0, column=1, padx=10, pady=5)
+
+# Chest Pain Type
+        chest_pain_type_frame=tk.Frame(self, bg='#041618')
+        chest_pain_type_frame.pack(pady=5)
+        chest_pain_type_label=tk.Label(chest_pain_type_frame, text="Chest Pain Type:", bg='#041618', fg="#FFFFC7", font=("Times New Roman", 18))
+        chest_pain_type_label.grid(row=0, column=0, padx=10, pady=5, sticky='w')
+        self.chest_pain_type=tk.StringVar(self)
+        self.chest_pain_type.set("Typical angina")
+        chest_pain_type_menu=tk.OptionMenu(chest_pain_type_frame,self.chest_pain_type,"Typical angina","Atypical angina","Non-anginal pain"," Asymptomatic")
+        chest_pain_type_menu.config(bg='#FFFFC7', font=("Helvetica", 12))
+        chest_pain_type_menu.grid(row=0, column=1, padx=10, pady=5)
+
+# Restingbps
+        resting_bps_frame = tk.Frame(self, bg='#041618')
+        resting_bps_frame.pack(pady=5)
+        resting_bps_label = tk.Label(resting_bps_frame, text="Resting bps:", bg='#041618', fg="#FFFFC7", font=("Times New Roman", 18))
+        resting_bps_label.grid(row=0, column=0, padx=10, pady=5, sticky='w')
+        self.resting_bps= tk.Entry(resting_bps_frame, bg='#FFFFC7', font=("Helvetica", 12))
+        self.resting_bps.grid(row=0, column=1, padx=10, pady=5)
+
+#cholesterol
+        cholesterol_frame = tk.Frame(self, bg='#041618')
+        cholesterol_frame.pack(pady=5)
+        cholesterol_label = tk.Label(cholesterol_frame, text="Cholesterol:", bg='#041618', fg="#FFFFC7", font=("Times New Roman", 16))
+        cholesterol_label.grid(row=0, column=0, padx=10, pady=5, sticky='w')
+        self.cholesterol = tk.Entry(cholesterol_frame, bg='#FFFFC7', font=("Helvetica", 12))
+        self.cholesterol.grid(row=0, column=1, padx=10, pady=5)
+
+#fastingblood sugar
+        fasting_blood_sugar_frame = tk.Frame(self, bg='#041618')
+        fasting_blood_sugar_frame.pack(pady=5)
+        fasting_blood_sugar_label = tk.Label(fasting_blood_sugar_frame, text="Fast Blood Sugar:", bg='#041618', fg="#FFFFC7", font=("Times New Roman", 18))
+        fasting_blood_sugar_label.grid(row=0, column=0, padx=10, pady=5, sticky='w')
+        self.fasting_blood_sugar = tk.StringVar(self)
+        self.fasting_blood_sugar.set("Fasting blood sugar > 120 mg/dl")
+        fasting_blood_sugar_menu = tk.OptionMenu(fasting_blood_sugar_frame, self.fasting_blood_sugar, "Fasting blood sugar > 120 mg/dl", "Fasting blood sugar < 120 mg/dl")
+        fasting_blood_sugar_menu.config(bg='#FFFFC7', font=("Helvetica", 12))
+        fasting_blood_sugar_menu.grid(row=0, column=1, padx=10, pady=5)
+       
+#Resting ecg 
+        resting_ecg_frame = tk.Frame(self, bg='#041618')
+        resting_ecg_frame.pack(pady=5)
+        resting_ecg_label = tk.Label(resting_ecg_frame, text="Resting ecg:", bg='#041618', fg="#FFFFC7", font=("Times New Roman", 18))
+        resting_ecg_label.grid(row=0, column=0, padx=10, pady=5, sticky='w')
+        self.resting_ecg = tk.StringVar(self)
+        self.resting_ecg.set("Normal")
+        resting_ecg_menu = tk.OptionMenu(resting_ecg_frame, self.resting_ecg,"Normal","Having ST-T wave abnormality","Showing probable or definite left ventricular hypertrophy by Estes criteria")
+        resting_ecg_menu.config(bg='#FFFFC7', font=("Helvetica", 12))
+        resting_ecg_menu.grid(row=0, column=1, padx=10, pady=5)
+# Max Heart Rate
+
+        max_heart_rate_frame = tk.Frame(self, bg='#041618')
+        max_heart_rate_frame.pack(pady=5)
+        max_heart_rate_label = tk.Label(max_heart_rate_frame, text="Max Heart Rate:", bg='#041618', fg="#FFFFC7", font=("Times New Roman", 18))
+        max_heart_rate_label.grid(row=0, column=0, padx=10, pady=5, sticky='w')
+        self.max_heart_rate = tk.Entry(max_heart_rate_frame, bg='#FFFFC7', font=("Helvetica", 12))
+        self.max_heart_rate.grid(row=0, column=1, padx=10, pady=5)
+
+# Exercise Angine
+        exercise_angine_frame = tk.Frame(self, bg='#041618')
+        exercise_angine_frame.pack(pady=5)
+        exercise_angina_label = tk.Label(exercise_angine_frame, text="Exercise Angine:", bg='#041618', fg="#FFFFC7", font=("Times New Roman", 18))
+        exercise_angina_label.grid(row=0, column=0, padx=10, pady=5, sticky='w')
+        self.exercise_angina = tk.StringVar(self)
+        self.exercise_angina.set("NO")
+        exercise_angina_menu = tk.OptionMenu(exercise_angine_frame, self.exercise_angina, "YES", "NO")
+        exercise_angina_menu.config(bg='#FFFFC7', font=("Helvetica", 12))
+      
+        exercise_angina_menu.grid(row=0, column=1, padx=10, pady=5)
+       
+
+# Old Peaks
+        oldpeak_frame = tk.Frame(self, bg='#041618')
+        oldpeak_frame.pack(pady=5)
+        oldpeak_label = tk.Label(oldpeak_frame, text="Old Peaks:", bg='#041618', fg="#FFFFC7", font=("Times New Roman", 18))
+        oldpeak_label.grid(row=0, column=0, padx=10, pady=5, sticky='w')
+        self.oldpeak = tk.IntVar(self)
+        self.oldpeak.set(0)
+        oldpeak_spinbox = tk.Spinbox(oldpeak_frame, from_=-10, to=10, increment=1, textvariable=self.oldpeak, font=("Helvetica", 12))
+        oldpeak_spinbox.grid(row=0, column=1, padx=10, pady=5)
+       
+# ST Slope
+        ST_slope_frame = tk.Frame(self, bg='#041618')
+        ST_slope_frame.pack(pady=5)
+        ST_slope_label = tk.Label(ST_slope_frame, text="ST Slope:", bg='#041618', fg="#FFFFC7", font=("Times New Roman", 18))
+        ST_slope_label.grid(row=0, column=0, padx=10, pady=5, sticky='w')
+        self.ST_slope = tk.StringVar(self)
+        self.ST_slope.set("Upsloping")
+        ST_slope_menu = tk.OptionMenu(ST_slope_frame, self.ST_slope,"Upsloping","Flat","Downsloping")
+        ST_slope_menu.config(bg='#FFFFC7', font=("Helvetica", 12))
+        ST_slope_menu.grid(row=0, column=1, padx=10, pady=5)
+        
+ # Label to display the prediction result
+        self.prediction_label = tk.Label(self, text="", bg='#041618', fg="#FFFFC7", font=("Times New Roman", 18))
+        self.prediction_label.pack(pady=0)
+        # Button to trigger the function
+        process_button = tk.Button(self, text="Predict", command=make_predictions, bg='#FFFFC7', font=("Helvetica", 14))
+        process_button.pack(pady=0)
 
 class SampleApp(tk.Tk):
     def __init__(self, *args, **kwargs):
@@ -345,7 +585,9 @@ class SampleApp(tk.Tk):
     def load_SVM_model(self):
         svr_model = joblib.load('./SVM/models/svrmodel.pkl')
         return svr_model
-
+    def load_dt_model(self):
+       DtModel = joblib.load('./Decision Tree/dtmodel.pkl')
+       return DtModel
 if __name__ == "__main__":
     app = SampleApp()
     app.mainloop()
