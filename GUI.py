@@ -130,25 +130,53 @@ class PageTwo(Page):
         
              
         def random_testing_values():
+            
+                #
+                dt = pd.read_excel('./SVM/test_values/Book1.xlsx')
+                dt
+                
+                
+                #           
+                property_type_values = np.ravel(dt['property_type'])
+                location_values = np.ravel(dt['location'])
+                city_values = np.ravel(dt['city'])
+                province_name_values = np.ravel(dt['province_name'])
+                baths_values = np.ravel(dt['baths'])
+                purpose_values = np.ravel(dt['purpose'])
+                bedrooms_values = np.ravel(dt['bedrooms'])
+                agency_values = np.ravel(dt['agency'])
+                agent_values = np.ravel(dt['agent'])
+                area_type_values = np.ravel(dt['Area Type'])
+                area_Size_values = np.ravel(dt['Area Size'])
+
+                #
+                index = np.random.randint(0, 7)
+            
                 # Clearing the agency field and setting a new value to it 
                 self.agency_entry.delete(0, tk.END)
-                self.agency_entry.insert(0, "default_agency")
+                self.agency_entry.insert(0, agency_values[index])
 
                 # Clearing the agent field and setting a new value to it 
                 self.agent_entry.delete(0, tk.END)
-                self.agent_entry.insert(0, "default_agency")
+                self.agent_entry.insert(0, agent_values[index])
                 
                 # Clearing the Location field and setting a new value to it 
                 self.location_entry.delete(0, tk.END)
-                self.location_entry.insert(0, "default_agency")
+                self.location_entry.insert(0, location_values[index])
                 
                 # Setting values to the rest of the inputs 
-                self.city_var.set()
-                self.province_name_var.set()
-                self.baths_var.set()
-                self.bedrooms_var.set()
-                self.property_type_var.set()
-                self.purpose_var.set()
+                self.city_var.set(city_values[index])
+                self.province_name_var.set(province_name_values[index])
+                self.baths_var.set(baths_values[index])
+                self.bedrooms_var.set(bedrooms_values[index])
+                self.property_type_var.set(property_type_values[index])
+                self.purpose_var.set(purpose_values[index])
+                
+                self.unit_combobox.delete(0, "end")
+                self.unit_combobox.set(area_type_values[index])
+                
+                self.area_spinbox.delete(0, "end")
+                self.area_spinbox.insert(0,area_Size_values[index])
                 
                     
                        
@@ -157,7 +185,7 @@ class PageTwo(Page):
                 area_value = float(self.area_spinbox.get())
                 area_type = self.unit_combobox.get()
                 
-                if  area_type=="marla":
+                if  area_type=="Marla":
                    area_value *= 25.2929
                 else:
                     area_value *= 505.857   
