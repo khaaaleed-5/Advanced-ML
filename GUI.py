@@ -132,7 +132,7 @@ class PageTwo(Page):
         def random_testing_values():
             
                 #
-                dt = pd.read_excel('./SVM/test_values/Book1.xlsx')
+                dt = pd.read_csv('./SVM/test_values/Book1.csv')
                 dt
                 
                 
