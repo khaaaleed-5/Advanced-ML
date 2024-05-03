@@ -127,10 +127,34 @@ class PageTwo(Page):
              
              # Updating the prediction label with the predicted class
              self.prediction_label.config(text=f"Prediction: {int(org_pred[0][0])}")
+        
              
+        def random_testing_values():
+                # Clearing the agency field and setting a new value to it 
+                self.agency_entry.delete(0, tk.END)
+                self.agency_entry.insert(0, "default_agency")
+
+                # Clearing the agent field and setting a new value to it 
+                self.agent_entry.delete(0, tk.END)
+                self.agent_entry.insert(0, "default_agency")
+                
+                # Clearing the Location field and setting a new value to it 
+                self.location_entry.delete(0, tk.END)
+                self.location_entry.insert(0, "default_agency")
+                
+                # Setting values to the rest of the inputs 
+                self.city_var.set()
+                self.province_name_var.set()
+                self.baths_var.set()
+                self.bedrooms_var.set()
+                self.property_type_var.set()
+                self.purpose_var.set()
+                
+                    
+                       
             
         def handle_area_Size():
-                area_value = float(self.area_entry.get())
+                area_value = float(self.area_spinbox.get())
                 area_type = self.unit_combobox.get()
                 
                 if  area_type=="marla":
@@ -147,6 +171,7 @@ class PageTwo(Page):
             
                 global user_inputs_df
                 
+                area_size = handle_area_Size()
                 # Retrieve values from entry fields and variables
                 agency_value = self.agency_entry.get()
                 agent_value = self.agent_entry.get()
@@ -162,7 +187,7 @@ class PageTwo(Page):
                 user_inputs_dict = {
                         'agency': agency_value,
                         'agent': agent_value,
-                        'Area Size': handle_area_Size(),
+                        'Area Size':area_size,
                         'location': location_value,
                         'city': city_value,
                         'province_name': province_name_value,
@@ -246,8 +271,8 @@ class PageTwo(Page):
         area_frame.pack(pady=5)
         area_label = tk.Label(area_frame, text="Area Size:", bg='#041618', fg="#FFFFC7", font=("Helvetica", 14))
         area_label.grid(row=0, column=0, padx=5, pady=5, sticky='w')
-        self.area_entry = tk.Entry(area_frame, bg='#FFFFC7', font=("Helvetica", 10), width=10)
-        self.area_entry.grid(row=0, column=1, padx=5, pady=5)
+        self.area_spinbox = tk.Spinbox(area_frame, from_=0, to=1000, bg='#FFFFC7', font=("Helvetica", 10), width=7)
+        self.area_spinbox.grid(row=0, column=1, padx=(0, 5), pady=5)
         self.unit_combobox = ttk.Combobox(area_frame, values=["marla", "kanal"], state="readonly", width=5)
         self.unit_combobox.grid(row=0, column=2, padx=5, pady=5)
         self.unit_combobox.current(0)  # Set default value to the first item
@@ -323,6 +348,10 @@ class PageTwo(Page):
         self.prediction_label = tk.Label(self, text="", bg='#041618', fg="#FFFFC7", font=("Helvetica", 16))
         self.prediction_label.pack(pady=10)
 
+        
+        # Button to trigger the function
+        process_button = tk.Button(self, text="random test inputs", command=random_testing_values, bg='#FFFFC7', font=("Helvetica", 14))
+        process_button.pack(pady=10)
         
         # Button to trigger the function
         process_button = tk.Button(self, text="Predict price", command=make_predictions, bg='#FFFFC7', font=("Helvetica", 14))
