@@ -46,6 +46,8 @@ class StartPage(Page):
 class PageOne(Page):
     def __init__(self, parent, controller):
         Page.__init__(self, parent, controller, "ANN")
+        self.ANN_model = self.controller.load_ANN_model()
+
 
         # Create a button to upload a photo
         upload_button = tk.Button(self, text="Upload Photo", width=10, height=1, bg='#FFFFC7', command=self.upload_photo)
@@ -62,27 +64,27 @@ class PageOne(Page):
     def upload_photo(self):
         filename = filedialog.askopenfilename()
         labels = ['fresh','rotten']
-        def preprocess_fun(img_path):
+        def predict(img_path):
             img = cv2.imread(img_path)
             img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
             img = cv2.resize(img,(28,28))
             img = img.astype(np.float32) / 255.0
-            return img
-        
-        if filename:
-            img = preprocess_fun(filename)
             arr = []
             arr.append(img)
             arr = np.array(arr)
-            ANN_model = self.controller.load_ANN_model()
-            pred = ANN_model.predict(arr)
+            pred = self.ANN_model.predict(arr)
             pred_class = np.argmax(pred)
             pred_label = labels[pred_class]
+            
+            return pred_label
+        
+        if filename:
+            prediction = predict(filename)
             
             # Open the selected image file
             image = Image.open(filename)
             # Resize the image to fit within a certain size (e.g., 256x256)
-            image = image.resize((256, 256), Image.ANTIALIAS)
+            image = image.resize((256, 256))
             # Convert the image for tkinter
             photo = ImageTk.PhotoImage(image)
             # Display the image on the label
@@ -90,7 +92,7 @@ class PageOne(Page):
             self.label.image = photo
             
             # Update the prediction label with the predicted class
-            self.prediction_label.config(text=f"Prediction: {pred_label}")
+            self.prediction_label.config(text=f"Prediction: {prediction}")
 
 
 # SVM page
