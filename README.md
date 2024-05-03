@@ -24,7 +24,7 @@ Detailed documentation for this project can be found [here](https://docs.google.
 ## Quick Start
 - Clone the Repo ```git clone https://github.com/khaaaleed-5/Advanced-ML.git```
 - Install requirements ```pip install requirement.txt```
-- Run **GUI.py** file then choose the model 
+- Run **GUI.py** file then choose model 
 
 ## Contributors
 - [**Khaled Ashraf**](https://github.com/khaaaleed-5)
