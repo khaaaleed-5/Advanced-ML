@@ -239,8 +239,8 @@ class PageTwo(Page):
                 area_type_values = np.ravel(dt['Area Type'])
                 area_Size_values = np.ravel(dt['Area Size'])
 
-                # Picking a random number in 0 to 7 since we only have 8 test examples
-                index = np.random.randint(0, 7)
+                # Picking a random number in 0 to 6 since we only have 7 test examples
+                index = np.random.randint(0, 6)
             
                 # Clearing the agency field and setting the random test value to it ( one of the ones we have earlier)
                 self.agency_entry.delete(0, tk.END)
