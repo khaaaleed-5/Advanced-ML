@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog,ttk
 from PIL import Image, ImageTk
 import cv2
 import numpy as np
@@ -8,6 +8,7 @@ import pandas as pd
 import joblib
 import pickle
 import os
+
 
 abspath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'SVM/')
 
@@ -128,19 +129,30 @@ class PageTwo(Page):
              self.prediction_label.config(text=f"Prediction: {int(org_pred[0][0])}")
              
             
-             
+        def handle_area_Size():
+                area_value = float(self.area_entry.get())
+                area_type = self.unit_combobox.get()
+                
+                if  area_type=="marla":
+                   area_value *= 25.2929
+                else:
+                    area_value *= 505.857   
+                    
+                return area_value      
+
+            
                        
         # function that read the user inputs      
         def save_user_inputs():
+            
                 global user_inputs_df
                 
                 # Retrieve values from entry fields and variables
                 agency_value = self.agency_entry.get()
                 agent_value = self.agent_entry.get()
-                area_value = float(self.area_entry.get())
                 location_value = self.location_entry.get()
-                city_value = self.city_entry.get()
-                province_name_value = self.province_name_entry.get()
+                city_value = self.city_var.get()
+                province_name_value = self.province_name_var.get()
                 baths_value = self.baths_var.get()
                 bedrooms_value = self.bedrooms_var.get()
                 property_type_value = self.property_type_var.get()
@@ -150,7 +162,7 @@ class PageTwo(Page):
                 user_inputs_dict = {
                         'agency': agency_value,
                         'agent': agent_value,
-                        'Area Size': area_value,
+                        'Area Size': handle_area_Size(),
                         'location': location_value,
                         'city': city_value,
                         'province_name': province_name_value,
@@ -219,14 +231,22 @@ class PageTwo(Page):
         self.agent_entry = tk.Entry(agent_frame, bg='#FFFFC7', font=("Helvetica", 12))
         self.agent_entry.grid(row=0, column=1, padx=10, pady=5)
 
-        # Area Size field
+        # Area Size frame
         area_frame = tk.Frame(self, bg='#041618')
         area_frame.pack(pady=5)
-        area_label = tk.Label(area_frame, text="Area Size:", bg='#041618', fg="#FFFFC7", font=("Helvetica", 16))
-        area_label.grid(row=0, column=0, padx=10, pady=5, sticky='w')
-        self.area_entry = tk.Entry(area_frame, bg='#FFFFC7', font=("Helvetica", 12))
-        self.area_entry.grid(row=0, column=1, padx=10, pady=5)
 
+        # Label for Area Size
+        area_label = tk.Label(area_frame, text="Area Size:", bg='#041618', fg="#FFFFC7", font=("Helvetica", 14))
+        area_label.grid(row=0, column=0, padx=5, pady=5, sticky='w')
+
+        # Entry for Area Size
+        self.area_entry = tk.Entry(area_frame, bg='#FFFFC7', font=("Helvetica", 10), width=10)
+        self.area_entry.grid(row=0, column=1, padx=5, pady=5)
+
+        # Combobox for Unit Selection
+        self.unit_combobox = ttk.Combobox(area_frame, values=["marla", "kanal"], state="readonly", width=5)
+        self.unit_combobox.grid(row=0, column=2, padx=5, pady=5)
+        self.unit_combobox.current(0)  # Set default value to the first item
         # Location field
         location_frame = tk.Frame(self, bg='#041618')
         location_frame.pack(pady=5)
@@ -234,23 +254,6 @@ class PageTwo(Page):
         location_label.grid(row=0, column=0, padx=10, pady=5, sticky='w')
         self.location_entry = tk.Entry(location_frame, bg='#FFFFC7', font=("Helvetica", 12))
         self.location_entry.grid(row=0, column=1, padx=10, pady=5)
-
-        # City field
-        city_frame = tk.Frame(self, bg='#041618')
-        city_frame.pack(pady=5)
-        city_label = tk.Label(city_frame, text="City:", bg='#041618', fg="#FFFFC7", font=("Helvetica", 16))
-        city_label.grid(row=0, column=0, padx=10, pady=5, sticky='w')
-        self.city_entry = tk.Entry(city_frame, bg='#FFFFC7', font=("Helvetica", 12))
-        self.city_entry.grid(row=0, column=1, padx=10, pady=5)
-
-        # Province Name field
-        province_name_frame = tk.Frame(self, bg='#041618')
-        province_name_frame.pack(pady=5)
-        province_name_label = tk.Label(province_name_frame, text="Province Name:", bg='#041618', fg="#FFFFC7", font=("Helvetica", 16))
-        province_name_label.grid(row=0, column=0, padx=10, pady=5, sticky='w')
-        self.province_name_entry = tk.Entry(province_name_frame, bg='#FFFFC7', font=("Helvetica", 12))
-        self.province_name_entry.grid(row=0, column=1, padx=10, pady=5)
-
 
         # Baths field
         baths_frame = tk.Frame(self, bg='#041618')
@@ -282,6 +285,31 @@ class PageTwo(Page):
         property_type_menu = tk.OptionMenu(property_type_frame, self.property_type_var, "House", "Flat", "Farm House", "Room", "Upper Portion", "Lower Portion", "Penthouse")
         property_type_menu.config(bg='#FFFFC7', font=("Helvetica", 12))
         property_type_menu.grid(row=0, column=1, padx=10, pady=5)
+
+        
+        # City field
+        city_frame = tk.Frame(self, bg='#041618')
+        city_frame.pack(pady=5)
+        city_label = tk.Label(city_frame, text="City:", bg='#041618', fg="#FFFFC7", font=("Helvetica", 16))
+        city_label.grid(row=0, column=0, padx=10, pady=5, sticky='w')
+        self.city_var = tk.StringVar(self)
+        self.city_var.set("islamabad")
+        city_menu = tk.OptionMenu(city_frame, self.city_var, "islamabad", "Lahore","Karachi","Faisalabad","Rawalpindi")
+        city_menu.config(bg='#FFFFC7', font=("Helvetica", 12))
+        city_menu.grid(row=0, column=1, padx=10, pady=5)
+        
+        
+        # Province Name field
+        province_name_frame = tk.Frame(self, bg='#041618')
+        province_name_frame.pack(pady=5)
+        province_name_label = tk.Label(province_name_frame, text="Province Name:", bg='#041618', fg="#FFFFC7", font=("Helvetica", 16))
+        province_name_label.grid(row=0, column=0, padx=10, pady=5, sticky='w')
+        self.province_name_var = tk.StringVar(self)
+        self.province_name_var.set("islamabad Capital")
+        province_name_menu = tk.OptionMenu(province_name_frame, self.province_name_var, "islamabad Capital", "Punjab","Sindh")
+        province_name_menu.config(bg='#FFFFC7', font=("Helvetica", 12))
+        province_name_menu.grid(row=0, column=1, padx=10, pady=5)
+        
 
         # Purpose field
         purpose_frame = tk.Frame(self, bg='#041618')
