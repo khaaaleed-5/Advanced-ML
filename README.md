@@ -10,16 +10,17 @@ Welcome to Advanced-ML, a repository showcasing advanced machine learning models
 - [Support Vector Machine](./SVM)
 - [Decision Tree](./Decision%20Tree)
 
-## Project Documentation
-
-Detailed documentation for this project can be found [here](https://docs.google.com/document/d/1y9hp2C2JwGEn95T29iHW5vC2vGX6dBYJn3wSIW_IYMU/edit).
-
 
 ## Datasets Used
 
 - [Fresh Vs Rotten](https://www.kaggle.com/datasets/alihasnainch/fruits-dataset-for-classification) 
 - [Heart Disease](https://www.kaggle.com/datasets/mexwell/heart-disease-dataset?select=heart_statlog_cleveland_hungary_final.csv)
 - [Pakistan Housnig Price](https://www.kaggle.com/datasets/jillanisofttech/pakistan-house-price-dataset) 
+
+## Project Documentation
+
+- Detailed documentation for this project can be found [here](https://docs.google.com/document/d/1y9hp2C2JwGEn95T29iHW5vC2vGX6dBYJn3wSIW_IYMU/edit).
+- Cover sheet [here](https://docs.google.com/document/d/1j9l1wRHrHcR8RnBupwncj6GXHqAsmpsgej_phyX8yUo/edit?usp=sharing)
 
 ## Quick Start
 - Clone the Repo ```git clone https://github.com/khaaaleed-5/Advanced-ML.git```
