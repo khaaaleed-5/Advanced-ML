@@ -1,0 +1,12 @@
+sklearn
+tkinter
+PIL
+cv2
+keras
+pandas
+seaborn
+matplotlib
+joblib
+category_encoders
+pickle
+os
