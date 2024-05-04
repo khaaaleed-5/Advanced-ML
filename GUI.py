@@ -95,6 +95,7 @@ class PageOne(Page):
             self.prediction_label.config(text=f"Prediction: {prediction}")
 
 
+
 # SVM page
 class PageTwo(Page):
     def __init__(self, parent, controller):
