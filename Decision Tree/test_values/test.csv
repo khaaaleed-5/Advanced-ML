@@ -1,0 +1,9 @@
+age,sex,chest pain type,resting bp s,cholesterol,fasting blood sugar,resting ecg,max heart rate,exercise angina,oldpeak,ST slope,target
+38,Male,Non-anginal pain,138,175,Fasting blood sugar < 120 mg/dl,Normal,173,NO,0,Upsloping,0
+57,Female,Atypical angina,130,236,Fasting blood sugar < 120 mg/dl,Showing probable or definite left ventricular hypertrophy by Estes criteria,174,NO,0,Flat,1
+57,Male,Asymptomatic,130,131,Fasting blood sugar < 120 mg/dl,Normal,115,YES,1.2,Flat,1
+68,Male,Asymptomatic,144,193,Fasting blood sugar > 120 mg/dl,Normal,141,NO,3.4,Flat,1
+45,Male,Typical angina,110,264,Fasting blood sugar < 120 mg/dl,Normal,132,NO,1.2,Flat,1
+57,Female,Asymptomatic,140,241,Fasting blood sugar < 120 mg/dl,Normal,123,YES,0.2,Flat,1
+59,Male,Asymptomatic,164,176,Fasting blood sugar > 120 mg/dl,Showing probable or definite left ventricular hypertrophy by Estes criteria,90,NO,1,Flat,1
+41,Male,Atypical angina,120,157,Fasting blood sugar < 120 mg/dl,Normal,182,NO,0,Upsloping,0

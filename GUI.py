@@ -487,6 +487,8 @@ class PageThree(Page):
                     'oldpeak': oldpeak_value,
                     'ST slope' : ST_slope_value
                     }
+            
+            
             # Convert the dictionary to a DataFrame
             df = pd.DataFrame(user_inputs_dict, index=[0])
             # Return the DataFrame
@@ -504,7 +506,7 @@ class PageThree(Page):
                         
                 return df
          
-
+    
         # Function that maakes predictions and displays it on activation failed: "No access to GitHub Copilot found. You are currently logged in as mohamedhanfi."
         def make_predictions():
                 
@@ -521,6 +523,8 @@ class PageThree(Page):
              df = df.reindex(columns=reindexed_columns)
              print(df)
 
+
+
              # Using the loaded model to Predict the price 
              dt_model=self.controller.load_dt_model()
              pred=dt_model.predict(df)
@@ -533,6 +537,58 @@ class PageThree(Page):
                 self.prediction_label.config(text="Result: Positive", fg="red")
              elif prediction_value == 0:
                 self.prediction_label.config(text="Result: Negative",fg="green")
+
+
+        # Function to randomize user inputs 
+        def random_testing():
+                
+        
+            # Reading the test values 
+            dt = pd.read_csv('./Decision Tree/test_values/test.csv')
+            
+            # Saving them into array   
+            age_value = np.ravel(dt['age'])
+            sex_value = np.ravel(dt['sex'])
+            chest_pain_type_value = np.ravel(dt['chest pain type'])
+            resting_bps_value = np.ravel(dt['resting bp s'])
+            cholesterol_value = np.ravel(dt['cholesterol'])
+            fasting_blood_sugar_value = np.ravel(dt['fasting blood sugar'])
+            resting_ecg_value = np.ravel(dt['resting ecg'])
+            max_heart_rate_value = np.ravel(dt['max heart rate'])
+            exercise_angina_value = np.ravel(dt['exercise angina'])
+            oldpeak_value = np.ravel(dt['oldpeak'])
+            ST_slope_value = np.ravel(dt['ST slope'])
+            
+            # Picking a random number in 0 to 6 since we only have 7 test examples
+            index = np.random.randint(0, min(len(age_value), 7))
+            # Update the entry fields with the randomly selected values
+            self.age_entry.delete(0, tk.END)
+            self.age_entry.insert(0, age_value[index])
+            #sex
+            self.Sex.set(sex_value[index])
+            #chest_pain
+            self.chest_pain_type.set(chest_pain_type_value[index])
+            
+            #resting_bps
+            self.resting_bps.delete(0, tk.END)
+            self.resting_bps.insert(0, resting_bps_value[index])
+            #cholesterol
+            self.cholesterol.delete(0, tk.END)
+            self.cholesterol.insert(0, cholesterol_value[index])
+            #fasting_blood_sugar
+            self.fasting_blood_sugar.set(fasting_blood_sugar_value[index])
+            #resting_ecg
+            self.resting_ecg.set(resting_ecg_value[index])
+
+            #max_heart_rate
+            self.max_heart_rate.delete(0, tk.END)
+            self.max_heart_rate.insert(0, max_heart_rate_value[index])
+            #exercise_angina
+            self.exercise_angina.set(exercise_angina_value[index])
+            #oldpeak
+            self.oldpeak.set(oldpeak_value[index])
+            #ST_slope
+            self.ST_slope.set(ST_slope_value[index])
 
 
 
@@ -597,61 +653,66 @@ class PageThree(Page):
         resting_ecg_frame = tk.Frame(self, bg='#041618')
         resting_ecg_frame.pack(pady=5)
         resting_ecg_label = tk.Label(resting_ecg_frame, text="Resting ecg:", bg='#041618', fg="#FFFFC7", font=("Times New Roman", 18))
-        resting_ecg_label.grid(row=0, column=0, padx=10, pady=5, sticky='w')
+        resting_ecg_label.grid(row=0, column=0, padx=10, pady=0, sticky='w')
         self.resting_ecg = tk.StringVar(self)
         self.resting_ecg.set("Normal")
         resting_ecg_menu = tk.OptionMenu(resting_ecg_frame, self.resting_ecg,"Normal","Having ST-T wave abnormality","Showing probable or definite left ventricular hypertrophy by Estes criteria")
         resting_ecg_menu.config(bg='#FFFFC7', font=("Helvetica", 12))
-        resting_ecg_menu.grid(row=0, column=1, padx=10, pady=5)
+        resting_ecg_menu.grid(row=0, column=1, padx=10, pady=0)
 # Max Heart Rate
 
         max_heart_rate_frame = tk.Frame(self, bg='#041618')
         max_heart_rate_frame.pack(pady=5)
         max_heart_rate_label = tk.Label(max_heart_rate_frame, text="Max Heart Rate:", bg='#041618', fg="#FFFFC7", font=("Times New Roman", 18))
-        max_heart_rate_label.grid(row=0, column=0, padx=10, pady=5, sticky='w')
+        max_heart_rate_label.grid(row=0, column=0, padx=10, pady=0, sticky='w')
         self.max_heart_rate = tk.Entry(max_heart_rate_frame, bg='#FFFFC7', font=("Helvetica", 12))
-        self.max_heart_rate.grid(row=0, column=1, padx=10, pady=5)
+        self.max_heart_rate.grid(row=0, column=1, padx=10, pady=0)
 
 # Exercise Angine
         exercise_angine_frame = tk.Frame(self, bg='#041618')
         exercise_angine_frame.pack(pady=5)
         exercise_angina_label = tk.Label(exercise_angine_frame, text="Exercise Angine:", bg='#041618', fg="#FFFFC7", font=("Times New Roman", 18))
-        exercise_angina_label.grid(row=0, column=0, padx=10, pady=5, sticky='w')
+        exercise_angina_label.grid(row=0, column=0, padx=10, pady=0, sticky='w')
         self.exercise_angina = tk.StringVar(self)
         self.exercise_angina.set("NO")
         exercise_angina_menu = tk.OptionMenu(exercise_angine_frame, self.exercise_angina, "YES", "NO")
         exercise_angina_menu.config(bg='#FFFFC7', font=("Helvetica", 12))
       
-        exercise_angina_menu.grid(row=0, column=1, padx=10, pady=5)
+        exercise_angina_menu.grid(row=0, column=1, padx=10, pady=0)
        
 
 # Old Peaks
         oldpeak_frame = tk.Frame(self, bg='#041618')
         oldpeak_frame.pack(pady=5)
         oldpeak_label = tk.Label(oldpeak_frame, text="Old Peaks:", bg='#041618', fg="#FFFFC7", font=("Times New Roman", 18))
-        oldpeak_label.grid(row=0, column=0, padx=10, pady=5, sticky='w')
+        oldpeak_label.grid(row=0, column=0, padx=10, pady=0, sticky='w')
         self.oldpeak = tk.IntVar(self)
         self.oldpeak.set(0)
         oldpeak_spinbox = tk.Spinbox(oldpeak_frame, from_=-10, to=10, increment=1, textvariable=self.oldpeak, font=("Helvetica", 12))
-        oldpeak_spinbox.grid(row=0, column=1, padx=10, pady=5)
+        oldpeak_spinbox.grid(row=0, column=1, padx=10, pady=0)
        
 # ST Slope
         ST_slope_frame = tk.Frame(self, bg='#041618')
         ST_slope_frame.pack(pady=5)
         ST_slope_label = tk.Label(ST_slope_frame, text="ST Slope:", bg='#041618', fg="#FFFFC7", font=("Times New Roman", 18))
-        ST_slope_label.grid(row=0, column=0, padx=10, pady=5, sticky='w')
+        ST_slope_label.grid(row=0, column=0, padx=10, pady=0, sticky='w')
         self.ST_slope = tk.StringVar(self)
         self.ST_slope.set("Upsloping")
         ST_slope_menu = tk.OptionMenu(ST_slope_frame, self.ST_slope,"Upsloping","Flat","Downsloping")
         ST_slope_menu.config(bg='#FFFFC7', font=("Helvetica", 12))
-        ST_slope_menu.grid(row=0, column=1, padx=10, pady=5)
+        ST_slope_menu.grid(row=0, column=1, padx=10, pady=0)
         
- # Label to display the prediction result
+        # Label to display the prediction result
         self.prediction_label = tk.Label(self, text="", bg='#041618', fg="#FFFFC7", font=("Times New Roman", 18))
         self.prediction_label.pack(pady=0)
+         # Button to set some random inputs 
+        process_button = tk.Button(self, text="random test inputs", command=random_testing, bg='#FFFFC7', font=("Helvetica", 14))
+        process_button.pack(pady=0)
         # Button to trigger the function
         process_button = tk.Button(self, text="Predict", command=make_predictions, bg='#FFFFC7', font=("Helvetica", 14))
         process_button.pack(pady=0)
+       
+      
 
 class SampleApp(tk.Tk):
     def __init__(self, *args, **kwargs):
